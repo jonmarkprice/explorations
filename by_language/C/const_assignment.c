@@ -24,7 +24,7 @@ void a(const char *const x)
    // character) should not be allowed to change, but how am I
    // changing the pointer?
    //
-   // more --> [*][*]
+   // more --> [0][1]
    //           |  |
    //           |  `---> [H][e][l][l][o]
    //           `------> [P][i][z][z][a]
@@ -34,9 +34,23 @@ void a(const char *const x)
    //
    // Are we actually *changing* the x pointer, or are we simply
    // making another thing point to it?
+   //
+   // TODO: Try to break it. If I *can* in some way modify
+   // the value (through the pointer), then it isn't right
 
-   printf("%c\n", *x);
+   // This issues more warnings, but still allows us to change the 
+   // array.
+   char *p = more;
+   p[0] = "A";
+   int i;
+   for (i = 0; i < 2; i++) {
+      printf("%s\n", more[i]);
+   }
+
+
+   // printf("%c\n", *x);
 
    // OK
    const char *even_more[] = {"One" "Two", x};
 }
+
