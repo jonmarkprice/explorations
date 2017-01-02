@@ -1,0 +1,6 @@
+[package]
+name = "input"
+version = "0.1.0"
+authors = ["Jonathan Price <jon.mark.price@gmail.com>"]
+
+[dependencies]
