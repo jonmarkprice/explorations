@@ -5,6 +5,8 @@
 #include <stdlib.h> // for exit
 #include <assert.h>
 
+void quit();
+
 // Now, let's make it bounce back and forth
 int main() {
    const unsigned short width = 20;
