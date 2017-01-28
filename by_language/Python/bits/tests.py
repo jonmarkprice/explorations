@@ -25,6 +25,7 @@ class BitTests(unittest.TestCase):
             a.set([0, 0, 0, 0])                 # and overflow?
 
     # Consider initiating content
+    # Alternatively, each of these could return None
     def test_unset(self):
         # Should raise NoValue if size of 1+
         with self.assertRaises(bits.NoValue):
@@ -32,7 +33,10 @@ class BitTests(unittest.TestCase):
 
         # Should not raise NoValue for size of 0
         self.assertEqual(Bits(0).array(), [])
-        self.assertEqual(Bits(0).num(), 0)
+
+        # num() not OK, even though array is
+        with self.assertRaises(bits.NoValue):
+            Bits(0).num()
 
         with self.assertRaises(bits.NoValue):
             Bits(1).num()
@@ -50,6 +54,29 @@ class BitTests(unittest.TestCase):
         b = a.slice(0, 3) # inclusive (first 4 bits)
         b.set([0, 1, 1, 0])
         self.assertEqual(a.array(), [0, 1, 1, 0, 0])
+
+    def test_slice_uninitiated(self):
+        a = Bits(5)
+        # Try to slice before initiating
+        a.slice(0, 3)
+
+    def test_slice_update_with_inst(self):
+        a = Bits(5)
+        b = a.slice(0, 2)
+        a.clear()
+
+        # update slice, test for update in bit array
+        b.set([0, 1, 1])
+        self.assertEqual(b.array(), [0, 1, 1]) # move to set test
+        self.assertEqual(a.array(), [0, 1, 1, 0, 0])
+
+        # update bit array, test update in slice
+        a.clear()
+        self.assertEqual(b.array(), [0, 0, 0])
+
+        # failing
+        self.assertEqual(b.num(), 0)
+        
 
 if __name__ == '__main__':
     unittest.main()
