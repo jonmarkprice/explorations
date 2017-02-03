@@ -1,0 +1,36 @@
+TARGET = Some("x86_64-unknown-linux-gnu")
+OPT_LEVEL = Some("0")
+PROFILE = Some("debug")
+TARGET = Some("x86_64-unknown-linux-gnu")
+debug=true opt-level=0
+HOST = Some("x86_64-unknown-linux-gnu")
+TARGET = Some("x86_64-unknown-linux-gnu")
+TARGET = Some("x86_64-unknown-linux-gnu")
+HOST = Some("x86_64-unknown-linux-gnu")
+CC_x86_64-unknown-linux-gnu = None
+CC_x86_64_unknown_linux_gnu = None
+HOST_CC = None
+CC = None
+HOST = Some("x86_64-unknown-linux-gnu")
+TARGET = Some("x86_64-unknown-linux-gnu")
+HOST = Some("x86_64-unknown-linux-gnu")
+CFLAGS_x86_64-unknown-linux-gnu = None
+CFLAGS_x86_64_unknown_linux_gnu = None
+HOST_CFLAGS = None
+CFLAGS = None
+running: "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-g" "-m64" "-fPIC" "-o" "/home/jon/files/Dropbox/learning/explorations/by_language/Rust/rust-to-c/target/debug/build/rust-to-c-9e16076bf5ce9b61/out/src/incr.o" "-c" "src/incr.c"
+ExitStatus(ExitStatus(0))
+TARGET = Some("x86_64-unknown-linux-gnu")
+TARGET = Some("x86_64-unknown-linux-gnu")
+HOST = Some("x86_64-unknown-linux-gnu")
+AR_x86_64-unknown-linux-gnu = None
+AR_x86_64_unknown_linux_gnu = None
+HOST_AR = None
+AR = None
+TARGET = Some("x86_64-unknown-linux-gnu")
+TARGET = Some("x86_64-unknown-linux-gnu")
+running: "ar" "crs" "/home/jon/files/Dropbox/learning/explorations/by_language/Rust/rust-to-c/target/debug/build/rust-to-c-9e16076bf5ce9b61/out/libincr.a" "/home/jon/files/Dropbox/learning/explorations/by_language/Rust/rust-to-c/target/debug/build/rust-to-c-9e16076bf5ce9b61/out/src/incr.o"
+ExitStatus(ExitStatus(0))
+TARGET = Some("x86_64-unknown-linux-gnu")
+cargo:rustc-link-lib=static=incr
+cargo:rustc-link-search=native=/home/jon/files/Dropbox/learning/explorations/by_language/Rust/rust-to-c/target/debug/build/rust-to-c-9e16076bf5ce9b61/out
