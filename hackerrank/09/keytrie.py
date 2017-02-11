@@ -9,8 +9,11 @@ class KeyTrie():
         if len(key) > 0:
             index   = self.index(key[0])
             rest    = key[1:]
-            node    = head.nodes[index]
             
+            node    = head.nodes[index]
+            if node is None:
+                return None
+            '''
             print('key: "' + str(key) + '"')
             print('index: "' + str(index) + '"')
             print('rest: "' + str(rest) + '"')
@@ -18,7 +21,7 @@ class KeyTrie():
             print('node value: ' + str(node.value))
             print('node end: ' + str(node.end))
             print('node children: ' + str(len(node.nodes)))
-            
+            '''
             if node.end and rest == '':
                 return node.value
 
@@ -27,9 +30,12 @@ class KeyTrie():
             else:
                 print('wtf')
         else:
+            '''
             print('key "' + str(key) + '" not found at: ')
             print(node.end)
             print(node.value)
+            '''
+            pass
 
     def index(self, char):
         code = ord(char)
