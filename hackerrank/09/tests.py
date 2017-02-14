@@ -2,14 +2,13 @@ import unittest
 from partial import PartialTrie
 
 class TestKeyTrie(unittest.TestCase):
- 
+
     def test_hr_01(self):
         p = PartialTrie()
         p.add('hack')
         p.add('hackerrank')
-        p.print_trie()
-        self.assertEqual(p.count('hac', True), 2)
-        self.assertEqual(p.count('hak', True), 0)
+        self.assertEqual(p.count('hac'), 2)
+        self.assertEqual(p.count('hak'), 0)
  
     def test_backwards(self):
         p = PartialTrie()
@@ -41,17 +40,15 @@ class TestKeyTrie(unittest.TestCase):
         p.add('b')
         self.assertEqual(p.find('a'), [])
 
-    @unittest.skip('')
-    def test_partial(self):
-        k = KeyTrie()
-        k.addNode('hack', Node(0))
-        k.addNode('hackerrank', Node(0))
+    def test_empty_key(self):
+        p = PartialTrie()
+        p.add('')
+        p.find('')
+
+    def test_key_single_key(self):
+        p = PartialTrie()
+        p.add('')
+        p.find('')
         
-        print(k.find('hac'))
-        print(k.find('hak'))
-        #self.assertTrue(k.find('hac'), 0) #
-        #self.assartFalse(k.find('hak'), 1)
-        
-        # TODO  NEED FIND PARTIAL FUNCTION
 if __name__ == '__main__':
     unittest.main()
