@@ -1,0 +1,6 @@
+// Set x to 3
+["set", "x", 3]
+["set", ["x", 3]]
+["set", {"var": "x", "to": 3}]
+["set", "x", {"type": "int", "value": 3}]
+{"stmt": "set", "var": "x", "value": 3, "type": "int"}
