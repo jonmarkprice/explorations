@@ -1,6 +1,6 @@
 from functools import reduce
 
-'''Trie without keys, support parial finds'''
+'''Trie without keys, support partial finds'''
 class PartialTrie():
     def __init__(self):
         self.head = Node()
@@ -20,19 +20,9 @@ class PartialTrie():
             if node.nodes[last].end:
                 results += 1
                 
-            # FIXME: We can skip this whole traversal by 
+            # We can skip this whole traversal by 
             # simply storing a running count in each node!
             results += node.nodes[last].count
-            #results += self.count_all(node.nodes[last])
-        return results
-    
-    def count_all(self, head):
-        results = 0
-        for i in range(0, self.keys):
-            if head.nodes[i] is not None:
-                if head.nodes[i].end:
-                    results += 1
-                results += self.count_all(head.nodes[i])
         return results
 
     def find(self, keys, verbose=False):
