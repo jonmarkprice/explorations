@@ -1,4 +1,5 @@
 import unittest
+import random
 from partial import PartialTrie
 
 class TestKeyTrie(unittest.TestCase):
@@ -50,6 +51,46 @@ class TestKeyTrie(unittest.TestCase):
         self.assertEqual(p.count('a'), 1)
         self.assertEqual(p.find('b'), [])
         self.assertEqual(p.count('b'), 0)
+
+    def test_larger(self):
+        contacts = [
+            'alex',
+            'alice',
+            'bob',
+            'jim',
+            'joe',
+            'john',
+            'joshua',
+            'joseph',
+            'jocelyn',
+            'felix',
+            'sally',
+            'sam',
+            'samantha',
+            'sandy',
+            'sydney',
+            'veronica',
+        ]
+        random.shuffle(contacts)
+        p = PartialTrie()
+        for name in contacts:
+            p.add(name)
+        #p.print_trie()
+        self.assertEqual(p.count('al'), 2)
+        self.assertEqual(p.count('annie'), 0)
+        
+        #print(p.find('s'))
+        self.assertEqual(p.count('s'), 5)
+        
+        #print(p.find('sa'))
+        self.assertEqual(p.count('sa'), 4) # FIXME
+        
+        self.assertEqual(p.count('sam'), 2)
+        self.assertEqual(p.count('jos'), 2)
+        self.assertEqual(p.count('jo'), 5)
+        self.assertEqual(p.count('j'), 6)
+        
+        self.assertEqual(p.count(''), 0)
 
 if __name__ == '__main__':
     unittest.main()
