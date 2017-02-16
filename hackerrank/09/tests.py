@@ -15,7 +15,9 @@ class TestKeyTrie(unittest.TestCase):
         p.add('abc')
         p.add('a')
         self.assertEqual(p.find('ab'), ['abc'])
+        self.assertEqual(p.count('ab'), 1)
         self.assertEqual(p.find('a'), ['a', 'abc'])
+        self.assertEqual(p.count('a'), 2)
  
     def test_add_multiple(self):
         p = PartialTrie()
@@ -23,18 +25,13 @@ class TestKeyTrie(unittest.TestCase):
         p.add('b')
         p.add('ab')
         
-        self.assertTrue(p.find('a'), ['a', 'ab'])
-        self.assertTrue(p.find('b'), ['b'])
-        self.assertTrue(p.find('ab'), ['ab'])
-    '''
-    # USE non-public api
-    #k.head.nodes[0]
-    def test_find_nonapi(self):
-        k = KeyTrie()
-        k.head.nodes[0] = Node(1)
-        self.assertEqual(k.find('a'), 1)
-    '''
-    
+        self.assertEqual(p.find('a'), ['a', 'ab'])
+        self.assertEqual(p.find('b'), ['b'])
+        self.assertEqual(p.find('ab'), ['ab'])
+        self.assertEqual(p.count('a'), 2)
+        self.assertEqual(p.count('b'), 1)
+        self.assertEqual(p.count('ab'), 1)
+
     def test_not_found(self):
         p = PartialTrie()
         p.add('b')
@@ -44,11 +41,15 @@ class TestKeyTrie(unittest.TestCase):
         p = PartialTrie()
         p.add('')
         p.find('')
+        self.assertEqual(p.count(''), 0)
 
     def test_key_single_key(self):
         p = PartialTrie()
-        p.add('')
-        p.find('')
-        
+        p.add('a')
+        self.assertEqual(p.find('a'), ['a'])
+        self.assertEqual(p.count('a'), 1)
+        self.assertEqual(p.find('b'), [])
+        self.assertEqual(p.count('b'), 0)
+
 if __name__ == '__main__':
     unittest.main()
