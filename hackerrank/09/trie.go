@@ -1,7 +1,37 @@
 package main
 
-import "fmt"
-import "errors"
+import (
+    "fmt"
+    "os"
+    "bufio"
+    "strconv"
+    "strings"
+    "errors"
+)
+
+func main() {
+    reader := bufio.NewReader(os.Stdin)
+    text, _ := reader.ReadString('\n')
+    text = strings.TrimRight(text, "\n")
+    n, _ := strconv.Atoi(text)
+    head := node{count: 0, end: false}
+    
+    for i := 0; i < n; i++ {
+        text, _ := reader.ReadString('\n')
+        parsed := strings.TrimRight(text, "\n")
+        words := strings.Split(parsed, " ")
+        if len(words) != 2 {
+            return
+        }
+        
+        switch words[0] {
+        case "find":
+            fmt.Println(count(&head, words[1]))
+        case "add":
+            add(&head, words[1])
+        }
+    }
+}
 
 func count(head *node, keys string) int {
     if len(keys) == 0 {
@@ -58,37 +88,4 @@ type node struct {
     end     bool
     child   [26]*node
 }
-
-func main() {
-    //fmt.Println("Hello world!")
-    head := node{count: 0, end: false}
-    //fmt.Println(head.count)
-    //fmt.Println(head.end)
-    
-    //head.child[0] = &node{count: 1, end: false}
-    //(*head).child[0] = node{count: 0, end: false}
-
-    //fmt.Println(head.child[0].count)
-    
-    /*for i := 0; i < 26; i++ {
-        fmt.Println(head.child[i])
-    }*/
-    //fmt.Println(count(&head, "abc"))
-    //fmt.Println(count(&head, ""))
-    
-    // Test of index
-    /*
-    fmt.Println(index('a'))
-    fmt.Println(index('f'))
-    fmt.Println(index('z'))
-    */
-    
-    // Simple add tests
-    //fmt.Println(head)
-    add(&head, "abc")
-    //fmt.Println(head)
-    fmt.Println(count(&head, "a"))
-    
-}
-
 
