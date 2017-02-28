@@ -5,6 +5,25 @@ class PartialTrie():
     def __init__(self):
         self.head = Node()
     
+    def __str__(self):
+        return str(self.head)
+
+    """
+    I would like a the trie to be ordered and intented, so that
+    'abc'
+    'abs'
+    'bsd'
+    would display as:
+        a
+            [a]b
+                [ab]c
+                [ab]s
+        b
+            [b]s
+                [bs]d
+    """
+        
+    
     def count(self, keys):
         if len(keys) == 0:
             return 0
@@ -15,23 +34,18 @@ class PartialTrie():
             new     = node.nodes[index]
             if new is not None:
                 node = new
+            else:
+                return 0
         last = self.index(keys[-1])
         if node.nodes[last] is not None:
-            if node.nodes[last].end:
-                results += 1
-                
-            # We can skip this whole traversal by 
-            # simply storing a running count in each node!
-            results += node.nodes[last].count
+            results = node.nodes[last].count
         return results
 
     def find(self, keys, verbose=False):
         if len(keys) == 0:
             return []
-
         node    = self.head
         results = []
-
         for i in range(0, len(keys) - 1):
             index   = self.index(keys[i])
             if verbose:
@@ -42,9 +56,10 @@ class PartialTrie():
                 for k in node.nodes:
                     print('{}: {}'.format(j, k))
                     j += 1
-            if new is None:
-                print('None! Key = ' + keys[i])
-            else:
+            #if new is None:
+            #    print('None! Key = ' + keys[i])
+            #else:
+            if new is not None:
                 node = new
         
         # Search last key:
@@ -73,33 +88,6 @@ class PartialTrie():
                     results.append(new_keys)
                 results += self.get_all(head.nodes[i], new_keys)
         return results
-        
-        # replace results with int
-    def count(self, keys):
-        if len(keys) == 0:
-            return 0
-        node    = self.head
-        results = 0
-        for i in range(0, len(keys) - 1):
-            index   = self.index(keys[i])
-            new     = node.nodes[index]
-            if new is not None:
-                node = new
-        last = self.index(keys[-1])
-        if node.nodes[last] is not None:
-            if node.nodes[last].end:
-                results += 1
-            results += self.count_all(node.nodes[last])
-        return results
-        
-    def count_all(self, head):
-        results = 0
-        for i in range(len(head.nodes)):
-            if head.nodes[i] is not None:
-                if head.nodes[i].end:
-                    results += 1
-                results += self.count_all(head.nodes[i])
-        return results
 
     def index(self, char):
         code = ord(char)
@@ -116,11 +104,10 @@ class PartialTrie():
                 node.nodes[index] = Node()
             if i == len(keys) - 1:
                 node.nodes[index].end = True
+            #print(chr(index + 97) + ': ' + str(node.nodes[index].count))
             node.nodes[index].count += 1
+            #print(chr(index + 97) + ': ' + str(node.nodes[index].count))
             node = node.nodes[index]
-
-    def print_trie(self):
-       print(self.head)
 
 class Node():
     def __init__(self):
@@ -135,7 +122,8 @@ class Node():
     def __str__(self):
         s = '['
         s += 'end: ' + str(self.end) + ', '
-        s += 'nodes: ' + str(len(self)) + ', ['
+        s += 'nodes: ' + str(len(self)) + ', '
+        s += 'count: ' + str(self.count) + ', ['
         for i in range(len(self.nodes)):
             if self.nodes[i] is not None:
                 s += '\n'
