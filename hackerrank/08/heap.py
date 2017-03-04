@@ -18,7 +18,6 @@ class Heap():
         while index < last:
             left  = 2 * index + 1
             right = 2 * index + 2
-            parent = (index - 1) // 2
             value = self.array[index]
 
             # Compare to childen
@@ -27,8 +26,7 @@ class Heap():
                     # No swap necessary, the heap property is in place.
                     if verbose:
                         print("Heap property restored.")
-                    #return
-                    index += 1
+                    return
 
                 elif self.array[left] < self.array[right]:
                     # We swapped with the smaller element, therefore, we only 
@@ -65,16 +63,26 @@ class Heap():
                 # Last element
                 return
 
+    # log(n) worst case, i.e. if new node needs to be the head.
+    def shift_up(self):
+        last = len(self.array) - 1
+        index = last
+        while index > 0:
+            parent = (index - 1) // 2
+            if self.array[index] < self.array[parent]:
+                # Heap property is violated
+                self.swap(index, parent)
+                index = parent # check parent's parent
+            else:
+                # Heap property is intact and we are guarenteed that still holds
+                return
+
     def swap(self, x, y):
         self.array[x], self.array[y] = self.array[y], self.array[x]
 
     def add(self, value):
-        if self.size() == 0:
-            self.array.append(value)
-        else:
-            self.array.append(self.array[0])
-            self.array[0] = value
-            self.reheap()
+        self.array.append(value)
+        self.shift_up()
 
     def pop(self, verbose=False):
         if self.array == []:
@@ -126,9 +134,9 @@ if __name__ == '__main__':
         a.append(a_t)
         h.add(a_t)
         h.sort()
-        if True:
+        if dbg:
             print('input  : ' + str(a))
             print('sorted : ' + str(h.array))
-        #print(median(h.array))
+        print(median(h.array))
     if dbg:
         print("Input was: " + str(a))
