@@ -1,6 +1,6 @@
 import unittest
 import random
-from heap import Heap, heapsort, median
+from heap import Heap, median
 
 class TestHeapSort(unittest.TestCase):
     
@@ -16,28 +16,28 @@ class TestHeapSort(unittest.TestCase):
         self.assertEqual(heap.pop(), None)
     
     def test_insert(self):
-        for i in range(500):
-            n = 10
-            heap = Heap()
-            values = list(range(n))
-            random.shuffle(values)
-            for value in values:
-                print('Inserting ' + str(value))
-                heap.add(value)
-                print(heap.array)
+        #for i in range(50):
+        n = 10
+        heap = Heap()
+        values = list(range(n))
+        random.shuffle(values)
+        for value in values:
+            print('Inserting ' + str(value))
+            heap.add(value)
+            print(heap.array)
 
-            # TODO: write a test to examine heap property
-            tmp = Heap(heap.array[:])
-            print('Original: ' + str(tmp.array))
-            tmp.heapify()
-            print('Heapified: ' + str(tmp.array))
-            for i in range(n):
-                print('Expecting ' + str(i))
-                print('Before: ' + str(tmp.array))
-                self.assertEqual(tmp.pop(), i)
-                print('After:  ' + str(tmp.array))
-
-            self.assertTrue(median(heapsort(heap)), median(sorted(values)))
+        # TODO: write a test to examine heap property
+        tmp = Heap(heap.array[:])
+        print('Original: ' + str(tmp.array))
+        tmp.heapify()
+        print('Heapified: ' + str(tmp.array))
+        for i in range(n):
+            print('Expecting ' + str(i))
+            print('Before: ' + str(tmp.array))
+            self.assertEqual(tmp.pop(), i)
+            print('After:  ' + str(tmp.array))
+            #heap.sort()
+            #self.assertTrue(median(heap.array), median(sorted(values)))
         
 if __name__ == '__main__':
     unittest.main()
