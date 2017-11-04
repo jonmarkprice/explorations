@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "build": "tsc maybe.ts",
+    "start": "node maybe.js"
+  },
+  "dependencies": {
+    "monet": "^0.8.10",
+    "typescript": "^2.6.1"
+  }
+}
