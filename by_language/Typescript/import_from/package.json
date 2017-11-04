@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build": "tsc hello.ts",
+    "start": "node hello.js"
+  },
+  "dependencies": {
+    "typescript": "^2.6.1"
+  }
+}
