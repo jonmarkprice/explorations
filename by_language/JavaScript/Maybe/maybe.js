@@ -28,6 +28,12 @@ class Maybe<T> {
             : this.__value
         );
     }
+
+    chain(f : (...any) => Maybe<any>) : Maybe<any> {
+        // curry((f, m) => m.map(f).join())
+        // compose(join, map(f))(m)
+        return this.map(f).join();
+    }
 }
 
 module.exports = Maybe;
