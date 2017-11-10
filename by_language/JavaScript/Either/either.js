@@ -29,7 +29,7 @@ class Left {
     }
 
     // or left()
-    error() : string {
+    left() : string {
         return this.__value;
     }
 
@@ -81,7 +81,7 @@ class Right<T> {
         return true;
     }
 
-    value() : T {
+    right() : T {
         return this.__value;
     }
 }
