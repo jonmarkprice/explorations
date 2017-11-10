@@ -5,9 +5,11 @@ const {
     append,     // a b
     curry,      // c
     compose,
-    drop,       // d e f g 
-    // dropLast
-    head,       // h
+    drop,       // d
+    dropLast,
+    equals,     // e f g
+    has,        // h 
+    head,       // 
     inc,        // i j k
     last,
     lensProp,   // l m n 
@@ -77,7 +79,7 @@ function tokenize(value : Literal, config : TokenizerConfig) : Token
             return {type: 'Char', value};
         }
         else {
-            throw Error('Abritrary strings not supported');
+            throw Error('Abritrary strings not supported.');
         }
     }
     else if (typeof value == 'boolean') {
@@ -98,7 +100,7 @@ function tokenize(value : Literal, config : TokenizerConfig) : Token
 function createSteps()
 { // previously parse
     // TODO
-    throw Error('Not implemented');
+    throw Error('Not implemented.');
 }
 
 // previously parseProgram
@@ -125,16 +127,21 @@ function parseToken(
     if (token.type === 'Syntax') {
         //return acc;
         switch (token.value) {
-            case ':': return parseFunction(acc);
+            case ':': return compose(parseFunction, popInput)(acc);
             case '[': return pushToStack(acc, token);
             case ']': return buildList(acc);
-            default : return Left.of('Unknown syntax');
+            default : return Left.of('Unknown syntax.');
         }
         // TODO:
         // what if token.type is Syntax, token.value is '['?
         // I don't want to duplicate all the code below (function?)
     }
     else return pushToStack(acc, token);
+}
+
+// Just remove the last input
+function popInput(acc : Accumulator) : Accumulator {
+    return acc.map(over(lensProp('input'), dropLast(1)));
 }
 
 // TODO: consider creating a parseSyntax helper
@@ -156,7 +163,7 @@ function pushToStack(acc : Accumulator, token : Token) : Accumulator {
 }
 
 function buildList(acc : Accumulator) : Accumulator {
-    return Left.of('buildList not implemented');
+    return Left.of('buildList not implemented.');
 }
 
 // This used to take 2 args, a fn and a stack
@@ -165,29 +172,32 @@ function buildList(acc : Accumulator) : Accumulator {
 // The other advantage of a single parameter is that we can check that the list is
 // empty *before* we try to get / drop last.
 // However, this might call for a name change... e.g. 'execute stack'
-/// @brief try to excute 4uid   the function on the stack.
+/// @brief try to excute the function on the stack.
 // XXX: Looks like this will need to take the full accumulator anyway... I will need
 //      to to pass back an index, first, etc.
 function parseFunction(acc : Accumulator) : Accumulator {
-    const fn : Token = R.last(acc.stack); // This could fail (if empty) // return Either on failure
-    switch (fn.type) {
-        // TODO: drop last (e.g. fn) from acc.stack
-        case 'Alias':
-            return expandAlias(fn, acc);
-        case 'Primitive':
-            return runPrimitive(fn, acc);
-        default:
-            throw Error('No function'); // TODO: return Either
+    // Pop the function (top/last of the stack).
+    const fn : Either<Token>    = acc.map(compose(last, prop('stack')));
+    const updated : Accumulator = acc.map(over(lensProp('stack'), dropLast(1)));
+    const fnType = fn.map(prop('type'));
+    if (equals(Right.of('Alias'), fnType)) {
+        return expandAlias(fn.right(), updated)
+    }
+    else if (equals(Right.of('Primitive'), fnType)) {
+        return runPrimitive(fn.right(), updated);
+    }
+    else {
+        // XXX Unreachable - by design
+        return Left.of('ERROR: Invalid function type.');
     }
 }
 
 // use in expandAlias and runPrimitive
 function expandAlias(alias : Token, acc : Accumulator) : Accumulator {
-    return Left.of('[INTERNAL] expandAlias not implemented');
+    return Left.of('[INTERNAL] expandAlias not implemented.');
 }
 
 function runPrimitive(fn : PrimitiveToken, acc : Accumulator) : Accumulator {
-/* --- UNDER CONSTRUCTION ---
     const library = new Map([
         ['id', {
             display: 'id',
@@ -198,23 +208,35 @@ function runPrimitive(fn : PrimitiveToken, acc : Accumulator) : Accumulator {
     ]);
 
     // TODO
-    // XXX: assume acc has had its stack truncated (by 1)
     if (library.has(fn.value)) {
-
         const libdef = library.get(fn.value)
         if (libdef === undefined) {
             return Left.of(`Error: ${fn.value} is not a function.`);
         }
         else {
-            const func = libdef.fn;
-            const [rest, args] = R.splitAt(-func.arity, acc.stack);
-            const result = func(args);
-    } 
-    else {
-        throw Error('Function not found.');
+            if (has('fn', libdef)) {
+                const func = libdef.fn;
+                const halves = acc.map(prop('stack'))
+                                  .map(R.splitAt(-func.arity)) // => Right<[_, _]> | Left
+                const rest = halves.map(R.nth(0));
+                const args  = halves.map(R.nth(1));
+                const result = Right.of(curry(func.apply(null))).ap(args);
+                const stack = Right.of(R.concat)
+                    .ap(rest)
+                    .ap(result)
+                    .join(); // Get rid of nested Either (TODO: use chain?)
+                return acc.map(R.set(lensProp('stack'), stack));
+            }
+            else {
+                return Left.of(`Error ${fn.value} has no implementation.`);
+            }
+        }
     }
-*/
-    return Left.of('[INTERNAL] runPrimitive not implemented.');
+    else {
+        return Left.of(`Function ${fn.value} not found.`);
+    }
+//*/
+    //return Left.of('[INTERNAL] runPrimitive not implemented.');
 }
 
 module.exports = {

@@ -51,5 +51,26 @@ test('parseStack', (assert) => {
             index: 2
         })
     );
+
+    // Try a (known) function
+    assert.deepEqual(
+
+         // Try a harder function.. id doesn't really tell us much!!!
+        parseStack([0, 'id', ':'].map(tokenize_), [], true, 0),
+        // Left.of('[INTERNAL] runPrimitive not implemented.')
+        // Right.of([{type: 'Number', value: 0}])
+        Right.of({
+            input: [],
+            stack: [{type: 'Number', value: 0}],
+            index: 2,       // Don't care
+            first: true     // Don't care
+        })
+    );
+
+    // Try an alias
+    assert.deepEqual(
+        parseStack([2, 2, {name: 'plus', expansion: '+'}, ':'].map(tokenize_), [], true, 0),
+        Left.of('[INTERNAL] expandAlias not implemented.')
+    )
     assert.end();
 });
