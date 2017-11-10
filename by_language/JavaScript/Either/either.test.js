@@ -1,5 +1,6 @@
 const { Left, Right }   = require('./either');
 const test              = require('tape');
+const R                 = require('ramda');
 
 test('Either construction', (assert) => {
     assert.deepEqual(
@@ -45,3 +46,25 @@ test('Either chain', (assert) => {
     );
     assert.end();
 })
+
+test('Either ap', (assert) => {
+    assert.deepEqual(
+        Right.of(R.add) // must be curried
+            .ap(Right.of(3))
+            .ap(Right.of(4)),
+        Right.of(7)
+    );
+    assert.deepEqual(
+        Right.of(R.add)
+            .ap(Left.of('Error'))
+            .ap(Right.of(4)),
+        Left.of('Error')
+    );
+    assert.deepEqual(
+        Left.of('Error')
+            .ap(Right.of(3))
+            .ap(Right.of(4)),
+        Left.of('Error')
+    );
+    assert.end();
+});

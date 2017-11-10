@@ -3,9 +3,7 @@
 // ... nevermind that is actually a lot easier to implement...
 
 // @flow
-//type Side = Either.Left | Either.Right;
-
-// type Either<T> = Left | Right<T>;
+export type Either<T> = Left | Right<T>;
 
 class Left {
     __valid : boolean;
@@ -21,7 +19,7 @@ class Left {
         return new Left(x);
     }
 
-    map(f : (x : any) => any) : Left {
+    map(f : any) : Left {
         return this; // Do nothing
     }
 
@@ -43,6 +41,11 @@ class Left {
         // this.map(f).join() both return this
         return this; // Do nothing
     }
+
+    ap(other : Either<any>) : Left {
+        // only works for curried functions
+        return this;
+    }
 }
 
 class Right<T> {
@@ -58,7 +61,7 @@ class Right<T> {
         return new Right(x);
     }
 
-    map(f : (...any) => any) : Right<T> {
+    map(f : any) : Right<T> {
         return Right.of(f(this.__value));
     }
 
@@ -68,6 +71,10 @@ class Right<T> {
 
     chain(f : (x : any) => any) : T {
         return this.map(f).join();
+    }
+
+    ap(other : Either<T>) : Either<T> {
+        return other.map(this.__value);
     }
 
     ok() : boolean {
