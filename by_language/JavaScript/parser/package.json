@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "test": "babel-tape-runner '*.test.js'",
+    "flow": "flow"
+  },
+  "dependencies": {
+    "ramda": "^0.25.0"
+  },
+  "devDependencies": {
+    "babel-tape-runner": "^2.0.1",
+    "babel-cli": "^6.26.0",
+    "babel-preset-flow": "^6.23.0",
+    "flow-bin": "^0.58.0",
+    "tape": "^4.8.0"
+  }
+}
