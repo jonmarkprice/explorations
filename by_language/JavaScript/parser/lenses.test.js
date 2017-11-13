@@ -4,7 +4,9 @@ const R                 = require('ramda');
 
 // using
 const {
+    add,
     append,     // a b
+    apply,
     curry,      // c
     compose,
     drop,       // d e f g 
@@ -161,6 +163,76 @@ test('From parse/', (assert) => {
     assert.end();
 });
 
+test('apply functions', (assert) => {
+    // Start off simple with just a function applied to a literal list of
+    // arguments
+    assert.deepEqual(
+        Right.of([2, 2]).map(apply(add)),
+        Right.of(4)
+    );
+
+    // Now let's suppose that list is a wrapped in an either
+    assert.deepEqual(
+        // We need to use ap() since we are essentially taking a wrapped argument
+        Right.of(apply(add)).ap(Right.of([2, 2])),
+        Right.of(4)
+    );
+
+    // Try if the stack fails...
+    assert.deepEqual(
+        Right.of(apply(add)).ap(Left.of('Error')),
+        Left.of('Error')
+    );
+
+    // But even our function is wrapped:
+    assert.deepEqual(
+        Right.of(apply)
+            .ap(Right.of(add))
+            .ap(Right.of([2, 2])),
+        Right.of(4)
+    );
+
+    // Later, we'll need to split a wrapped stack into a list and a rest,
+    // apply a function, and concat that to the stack.
+    // Eventually the stack itselft needs to be part of a larger Accumulator
+    // object, so we may need to do all of our edits through lenses
+
+    assert.end();
+});
+
+test('split list', (assert) => {
+    assert.deepEqual(
+        Right.of([1, 2, 3, 4, 5])
+            .map(R.splitAt(3)),
+        Right.of([[1, 2, 3], [4, 5]])
+    );
+
+    // Assume arity = 2
+    assert.deepEqual(
+        Right.of([1, 2, 3, 4, 5])
+            .map(R.dropLast(2)), // easier than splitAt . nth(0)
+        Right.of([1, 2, 3])
+    );
+
+    // Assume arity = 2
+    assert.deepEqual(
+        Right.of([1, 2, 3, 4, 5])
+            .map(R.takeLast(2)),
+        Right.of([4, 5])
+    );
+
+    assert.end();
+});
+
+test('concat lists', (assert) => {
+    assert.deepEqual(
+        Right.of(R.concat)
+            .ap(Right.of([1, 2]))
+            .ap(Right.of([3, 4])),
+        Right.of([1, 2, 3, 4])
+    );
+    assert.end();
+});
 // let's expand this out:
 // F.ap(G) = G.map(F.v)
 // thus:
