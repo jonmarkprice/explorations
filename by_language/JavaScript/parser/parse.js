@@ -21,7 +21,12 @@ const {
     view        // v w x y z
 } = R; // from ramda
 
+import type { Type, TokenType } from './typecheck';
+import type { Either } from '../Either/either';
+//export type Either<T> = Left | Right<T>; // TODO import
+
 const { Left, Right } = require('../Either/either');
+const { interpretTypes } = require('./typecheck');
 
 //type Alias   = {type: string, expansion: Array<Literal | Alias>}; // recursive types ok?
 export type AliasLiteral = {name: string, expansion: Literal[]};
@@ -34,7 +39,6 @@ export type ValueToken = {type: 'Boolean', value: boolean}
     | {type: 'Number', value: number} 
     | {type: 'Char', value: string};
 
-export type Either<T> = Left | Right<T>;
 // TODO: potentially make function / alias sub-types
 
 export type TokenizerConfig = {
@@ -198,13 +202,19 @@ function runPrimitive(fn : PrimitiveToken, acc : Accumulator) : Accumulator {
         ['id', {
             display: 'id',
             arity: 1,
-            types: {in: ['any'], out: 'Number'}, // XXX
+            types: {
+                in: [{type:'Any', id: 1}],
+                out: {type: 'Any', id: 1}
+            },
             fn: R.identity
         }],
         ['+', {
             display: '+',
             arity: 2,
-            types: {in: ['Number', 'Number'], out: 'Number'},
+            types: {
+                in: [{type: 'Number'}, {type: 'Number'}],
+                out: {type: 'Number'}
+            },
             fn: R.add
         }]
     ]);
@@ -255,8 +265,6 @@ function runPrimitive(fn : PrimitiveToken, acc : Accumulator) : Accumulator {
     // return Left.of('[INTERNAL] runPrimitive not implemented.');
 }
 
-//type Type = {id: number} | string;
-// or just use Number, String, ... then a, b, c ...
 type LibDef = {
     display: string,
     arity: number,
@@ -277,10 +285,25 @@ function applyDef(def : LibDef, args : Either<Token[]>) : Either<Token> {
         // to Right.of(def.types.out)
         const list = args.right();
         const raw : Literal[] = list.map(prop('value'));
+        const types : TokenType[] = list.map(prop('type'));
+        /*
         return Right.of({
             value: R.apply(def.fn, raw),
             type: 'TODO'
-        });
+        });*/
+
+        // return Right.of({ value: R.apply(def.fn, raw) })
+        //     .map(x => R.assoc('type', x))
+        //     .ap(interpretTypes(types, def.types));
+        // XXX This is wrong!!!!!!
+        const value = Right.of({value: R.apply(def.fn, raw)});
+        
+        const res = Right.of(x => y => R.assoc('type', x, y))
+            .ap(interpretTypes(types, def.types))
+            //.ap(Right.of('TODO'))
+            .ap(value);
+            //.ap(Right.of({value: 0}))
+        return res;
     }
     else {
         return args; // pass error through

@@ -58,7 +58,7 @@ test('parseStack', (assert) => {
         //Left.of('[INTERNAL] runPrimitive not implemented.')
         Right.of({
             input: [],
-            stack: [{type: 'TODO', value: 0}],
+            stack: [{type: 'Number', value: 0}],
             index: 2,       // Don't care
             first: true     // Don't care
         })
@@ -75,7 +75,7 @@ test('parseStack', (assert) => {
         parseStack([3, 4, '+', ':'].map(tokenize_), [], true, 0),
         Right.of({
             input: [],
-            stack: [{type: 'TODO', value: 7}],
+            stack: [{type: 'Number', value: 7}],
             index: 3,       // Don't care
             first: true     // Don't care
         })

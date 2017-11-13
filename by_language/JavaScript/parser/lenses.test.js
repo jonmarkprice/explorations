@@ -7,6 +7,7 @@ const {
     add,
     append,     // a b
     apply,
+    assoc,
     curry,      // c
     compose,
     concat,     
@@ -330,6 +331,50 @@ test('apply in lense', (assert) => {
     assert.end();
 });
 
+test('AP', (assert) => {
+    // TODO
+    // Basically I was (am) trying do something like this;
+
+    // return Right.of({ value: R.apply(def.fn, raw) })
+    //     .map(x => R.assoc('type', x))
+    //     .ap(interpretTypes(types, def.types));
+    // XXX This is wrong!!!!!!
+
+
+    // First just add regular property
+    assert.deepEqual(
+        Right.of({a: 1})
+            .map(assoc('b', 2)),
+        Right.of({a: 1, b: 2})
+    );
+
+    // Add Either<prop> to obj
+    // flip order to use ap instead of map
+    assert.deepEqual(
+        Right.of(x => assoc('b', 2, x))
+            .ap(Right.of({a: 1})),
+        Right.of({a: 1, b: 2})
+    );
+
+    // use variable
+    assert.deepEqual(
+        Right.of(x => y => assoc('b', x, y))
+            .ap(Right.of(2))
+            .ap(Right.of({a: 1})),
+        Right.of({a: 1, b: 2})
+    );
+
+    // what if x is a Left?
+    assert.deepEqual(
+        Right.of(x => y => assoc('b', x, y))
+            .ap(Left.of("Bad types"))
+            .ap(Right.of({a: 1})),
+        Left.of("Bad types")
+    );
+
+
+    assert.end();
+});
 
 
 // let's expand this out:
