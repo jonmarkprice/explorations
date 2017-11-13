@@ -12,7 +12,7 @@ const { Right, Left } = require('../Either/either');
 // Bake-in the config. for more convient testing.
 const config = {
     syntax: new Set([':', '[', ']']),
-    primitives: new Set(['id']) // expand as necessary
+    primitives: new Set(['id', '+']) // expand as necessary
 }
 const tokenize_ = x => tokenize(x, config);
 
@@ -54,14 +54,11 @@ test('parseStack', (assert) => {
 
     // Try a (known) function
     assert.deepEqual(
-
-         // Try a harder function.. id doesn't really tell us much!!!
         parseStack([0, 'id', ':'].map(tokenize_), [], true, 0),
-        // Left.of('[INTERNAL] runPrimitive not implemented.')
-        // Right.of([{type: 'Number', value: 0}])
+        //Left.of('[INTERNAL] runPrimitive not implemented.')
         Right.of({
             input: [],
-            stack: [{type: 'Number', value: 0}],
+            stack: [{type: 'TODO', value: 0}],
             index: 2,       // Don't care
             first: true     // Don't care
         })
@@ -71,6 +68,18 @@ test('parseStack', (assert) => {
     assert.deepEqual(
         parseStack([2, 2, {name: 'plus', expansion: '+'}, ':'].map(tokenize_), [], true, 0),
         Left.of('[INTERNAL] expandAlias not implemented.')
-    )
+    );
+
+    // Try a harder function.. id doesn't really tell us much!!!
+    assert.deepEqual(
+        parseStack([3, 4, '+', ':'].map(tokenize_), [], true, 0),
+        Right.of({
+            input: [],
+            stack: [{type: 'TODO', value: 7}],
+            index: 3,       // Don't care
+            first: true     // Don't care
+        })
+    );
+    //*/
     assert.end();
 });

@@ -9,12 +9,15 @@ const {
     apply,
     curry,      // c
     compose,
-    drop,       // d e f g 
+    concat,     
+    drop,       // d
+    dropLast,    // e f g 
     head,       // h
     inc,        // i j k
     lensProp,   // l m n 
     over,       // o
-    prop,       // p q r s t u
+    prop,       // p q r s 
+    takeLast,   //t u
     view        // v w x y z
 } = R; // from ramda
 
@@ -233,7 +236,104 @@ test('concat lists', (assert) => {
     );
     assert.end();
 });
+
+test('apply in lense', (assert) => {
+    assert.deepEqual(
+        // First combine the last two tests
+        Right.of(takeLast(2, [1, 2, 3, 4]))
+            .map(apply(add)),
+        Right.of(7)
+    );
+
+    // Now do the same from within an object using lenses
+    const obj = {
+        stack: [1, 2, 3, 4]
+    };
+    const lenses = { stack: lensProp('stack') };
+    assert.deepEqual(
+        Right.of(obj)
+            .map(over(lenses.stack, takeLast(2)))
+            .map(over(lenses.stack, apply(add))),
+        Right.of({
+            stack: 7
+        })
+    );
+    
+    // use curry
+    assert.deepEqual(
+        Right.of(curry((x, y) => over(lenses.stack, append(x), y)))
+            .ap(Right.of(2))
+            .ap(Right.of({
+                stack: [1]
+            })),
+        Right.of({stack: [1, 2]})
+    );
+
+    // or directly with => => 
+    assert.deepEqual(
+        Right.of(x => y => over(lenses.stack, append(x), y))
+            .ap(Right.of(2))
+            .ap(Right.of({
+                stack: [1]
+            })),
+        Right.of({stack: [1, 2]})
+    );
+
+    // Lets abstract away... and just add within a obj
+    assert.deepEqual(
+        Right.of({a: 1})
+            .map(over(lensProp('a'), inc)),
+        Right.of({a: 2})
+    );
+
+    // now append a constant
+    assert.deepEqual(
+        Right.of({stack: [1, 2]})
+            .map(over(lenses.stack, append(7))),
+        Right.of({stack: [1, 2, 7]})
+    );
+
+    // same using ap
+    assert.deepEqual(
+        Right.of(over(lenses.stack, append(7)))
+            .ap(Right.of({stack: [1, 2]})),
+        Right.of({stack: [1, 2, 7]})
+    );
+
+    // now append a variable
+    assert.deepEqual(
+        Right.of(x => over(lenses.stack, append(x)))
+            .ap(Right.of(7))
+            .ap(Right.of({stack: [1, 2]})),
+        Right.of({stack: [1, 2, 7]})
+    );
+
+    // Let's add some complexity
+    assert.deepEqual(
+        Right.of(x => over(lenses.stack, append(x)))
+            .ap(
+
+                Right.of(obj)
+                    .map(prop('stack'))
+                    .map(takeLast(2))
+                    .map(apply(add))
+                // Right.of(7)
+            )
+            .ap(
+                Right.of(obj)
+                    .map(over(lenses.stack, dropLast(2)))
+                // Right.of({stack: [1, 2]})
+            ),
+        Right.of({stack: [1, 2, 7]})
+    );
+
+    assert.end();
+});
+
+
+
 // let's expand this out:
 // F.ap(G) = G.map(F.v)
 // thus:
 // F.ap(F.map(f)) = [F.map(f)].map(F.v) = F.map(f).map(F.v)
+

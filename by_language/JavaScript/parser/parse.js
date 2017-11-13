@@ -3,16 +3,19 @@
 const R = require('ramda');
 const {
     append,     // a b
+    assoc,
     curry,      // c
     compose,
     drop,       // d
     dropLast,
-    equals,     // e f g
+    equals,     // e
+    findIndex,  // f g
     has,        // h 
     head,       // 
     inc,        // i j k
-    last,
-    lensProp,   // l m n 
+    last,       
+    lensProp,   // l m 
+    nth,        // n 
     over,       // o
     prop,       // p q r s t u
     view        // v w x y z
@@ -45,17 +48,6 @@ type Accumulator = Either<{
     first : boolean,
     index : number
 }>;
-
-// consider making Token a class
-/*class Alias {
-    //properties
-    __type      : string;
-    __expansion : Array<Alias | Literal>;
-    constructor(def : Array<Alias | Literal>) : void {
-        this.__type = 'alias';
-        this.__expansion = def;
-    }
-}*/
 
 // NOTE: This funtion is intended to be mapped over.
 // Assume there can't be any lists, only cons or list literals '[', ']'
@@ -127,7 +119,7 @@ function parseToken(
     if (token.type === 'Syntax') {
         //return acc;
         switch (token.value) {
-            case ':': return compose(parseFunction, popInput)(acc);
+            case ':': return compose(parseFunction, popInput)(acc); // XXX This should check the type (Prim., Alias)
             case '[': return pushToStack(acc, token);
             case ']': return buildList(acc);
             default : return Left.of('Unknown syntax.');
@@ -149,7 +141,7 @@ function popInput(acc : Accumulator) : Accumulator {
 function pushToStack(acc : Accumulator, token : Token) : Accumulator {
     // TODO: consider moving to larger scope
     const lenses = {
-        input: lensProp('input'), 
+        input: lensProp('input'),
         stack: lensProp('stack'),
         index: lensProp('index'),
         // first: lensProp('first'); // Not used
@@ -175,6 +167,8 @@ function buildList(acc : Accumulator) : Accumulator {
 /// @brief try to excute the function on the stack.
 // XXX: Looks like this will need to take the full accumulator anyway... I will need
 //      to to pass back an index, first, etc.
+
+// XXX: Doesn't seem to care about whether or not the type is Primitive or Alias
 function parseFunction(acc : Accumulator) : Accumulator {
     // Pop the function (top/last of the stack).
     const fn : Either<Token>    = acc.map(compose(last, prop('stack')));
@@ -188,6 +182,7 @@ function parseFunction(acc : Accumulator) : Accumulator {
     }
     else {
         // XXX Unreachable - by design
+        console.log(fn);
         return Left.of('ERROR: Invalid function type.');
     }
 }
@@ -198,16 +193,24 @@ function expandAlias(alias : Token, acc : Accumulator) : Accumulator {
 }
 
 function runPrimitive(fn : PrimitiveToken, acc : Accumulator) : Accumulator {
+    const lenses = {stack: lensProp('stack')};
     const library = new Map([
         ['id', {
             display: 'id',
             arity: 1,
-            types: ['any'],
+            types: {in: ['any'], out: 'Number'}, // XXX
             fn: R.identity
         }],
+        ['+', {
+            display: '+',
+            arity: 2,
+            types: {in: ['Number', 'Number'], out: 'Number'},
+            fn: R.add
+        }]
     ]);
 
     // TODO
+    
     if (library.has(fn.value)) {
         const libdef = library.get(fn.value)
         if (libdef === undefined) {
@@ -215,17 +218,30 @@ function runPrimitive(fn : PrimitiveToken, acc : Accumulator) : Accumulator {
         }
         else {
             if (has('fn', libdef)) {
-                const func = libdef.fn;
-                const halves = acc.map(prop('stack'))
-                                  .map(R.splitAt(-func.arity)) // => Right<[_, _]> | Left
-                const rest = halves.map(R.nth(0));
-                const args  = halves.map(R.nth(1));
-                const result = Right.of(curry(func.apply(null))).ap(args);
-                const stack = Right.of(R.concat)
-                    .ap(rest)
+                // const result = Right
+                //.of(applyOverTokens)
+                //.of(curry(applyOverTokens)(libdef.fn))
+                //.ap(acc.map(prop('stack'))
+                    //.map(R.takeLast(libdef.arity)));
+         
+                const args = acc.map(R.prop('stack'))
+                                .map(R.takeLast(libdef.arity));
+                const result = applyDef(libdef, acc.map(R.prop('stack')))
+                
+                //const result = acc.map(prop('stack'))
+                    //.map(R.takeLast(libdef.arity))
+                    //.map(R.apply(libdef.fn));
+                    //.map(curry(applyOverTokens)(libdef.fn));
+                // XXX const result = Right.of({type: 'Number', value: 0})
+                // Ok, I see the problem we need to apply with the tokens...
+                // Currently we are trying to do: 
+                //  {type: '', value: 3} + {type: '', value: 4}
+                // which of course is NaN!
+
+                const rest = acc.map(R.over(lenses.stack, R.dropLast(libdef.arity)));
+                return Right.of(x => R.over(lenses.stack, R.append(x)))
                     .ap(result)
-                    .join(); // Get rid of nested Either (TODO: use chain?)
-                return acc.map(R.set(lensProp('stack'), stack));
+                    .ap(rest);
             }
             else {
                 return Left.of(`Error ${fn.value} has no implementation.`);
@@ -235,8 +251,40 @@ function runPrimitive(fn : PrimitiveToken, acc : Accumulator) : Accumulator {
     else {
         return Left.of(`Function ${fn.value} not found.`);
     }
-//*/
-    //return Left.of('[INTERNAL] runPrimitive not implemented.');
+    
+    // return Left.of('[INTERNAL] runPrimitive not implemented.');
+}
+
+//type Type = {id: number} | string;
+// or just use Number, String, ... then a, b, c ...
+type LibDef = {
+    display: string,
+    arity: number,
+    types: {
+        in: Type[],
+        out: Type
+    },
+    fn: (any) => any
+}
+
+// TODO type check
+// sure... I just need to map over something that either returns
+// a Left() or echos the input
+// maybe just concat() instead of appending...
+function applyDef(def : LibDef, args : Either<Token[]>) : Either<Token> { 
+    if (args.ok()) {
+        // TODO compare args.right().map(prop('type'))
+        // to Right.of(def.types.out)
+        const list = args.right();
+        const raw : Literal[] = list.map(prop('value'));
+        return Right.of({
+            value: R.apply(def.fn, raw),
+            type: 'TODO'
+        });
+    }
+    else {
+        return args; // pass error through
+    }
 }
 
 module.exports = {
