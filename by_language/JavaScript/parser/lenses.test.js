@@ -372,7 +372,6 @@ test('AP', (assert) => {
         Left.of("Bad types")
     );
 
-
     assert.end();
 });
 

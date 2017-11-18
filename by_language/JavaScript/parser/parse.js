@@ -36,7 +36,7 @@ export type SyntaxToken = {type: 'Syntax', value: string};
 export type PrimitiveToken = {type: 'Primitive', value: string};
 export type AliasToken = {type: 'Alias', value: AliasLiteral};
 export type ValueToken = {type: 'Boolean', value: boolean} 
-    | {type: 'Number', value: number} 
+    | {type: 'Number', value: number}
     | {type: 'Char', value: string};
 
 // TODO: potentially make function / alias sub-types
@@ -281,8 +281,6 @@ type LibDef = {
 // maybe just concat() instead of appending...
 function applyDef(def : LibDef, args : Either<Token[]>) : Either<Token> { 
     if (args.ok()) {
-        // TODO compare args.right().map(prop('type'))
-        // to Right.of(def.types.out)
         const list = args.right();
         const raw : Literal[] = list.map(prop('value'));
         const types : TokenType[] = list.map(prop('type'));
