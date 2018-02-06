@@ -1,0 +1,22 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Set Store</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+  <head>
+  <body>
+    <div id="app">
+      <label>
+        Key: <input type="text" v-model="key" />
+      </label>
+      <label>
+        Value: <input type="text" v-model="value" />
+      </label>
+      <button v-on:click="setPair">Set</button>
+
+      <button v-on:click="redirect">Go</button>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>
