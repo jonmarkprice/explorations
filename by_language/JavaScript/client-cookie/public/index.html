@@ -1,0 +1,21 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Set Cookie</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+  <head>
+  <body>
+    <div id="app">
+      <legend>Set</legend>
+      <input type="text" v-model="cookie" />
+      <button v-on:click="setCookie">Set</button>
+
+      <legend>Cookies</legend>
+      <pre>{{ cookies() }}</pre>
+      <button v-on:click="ping">Ping!</button>
+      <button v-on:click="redirect">Go</button>
+    </div>
+    <script src="client.js"></script>
+  </body>
+</html>
