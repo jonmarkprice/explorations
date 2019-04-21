@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  </head>
+  <body>
+    <div id="app">
+      <h1>Indirection</h1>
+      <h2>HTML content</h2>
+      <code>
+        direct: {{ ptr.hi }} <br />
+        indirect: {{ ptr[key] }}
+      </code>
+      <h2>Attributes</h2>
+      <input type="text" value="literal" />
+      <input type="text" v-bind:value="ptr.hi" />
+      <input type="text" v-bind:value="ptr[key]" />
+
+      <h2>Models</h2>
+      <input type="text" v-model="m1" />
+      <input type="text" v-model="models.direct" />
+      <input type="text" v-model="models[key]" />
+
+      <h3>Model data</h3>
+      <p>
+        m1: {{ m1 }} <br />
+        direct: {{ models.direct }} <br />
+        indirect: {{ models[key] }} <br />
+      </p>
+    </div>
+    <script>
+      new Vue({
+        el: '#app',
+        data: {
+          ptr: {
+            hi: 'Hi!',
+            bye: 'Bye!'
+          },
+          key: 'bye',
+          m1: '',
+          models: {
+            direct: '',
+            bye: 'indirect'
+          }
+        },
+      })
+    </script>
+  </body>
+</html>
